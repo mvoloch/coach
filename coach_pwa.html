@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0a1a10">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="COACH">
+<meta name="application-name" content="COACH">
+<link rel="manifest" href="data:application/json;charset=utf-8,%7B%22name%22%3A%22COACH%20%E2%80%94%20Marcus%22%2C%22short_name%22%3A%22COACH%22%2C%22description%22%3A%22Plano%20de%20corrida%20Marcus%20Voloch%202026%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a1a10%22%2C%22theme_color%22%3A%22%230a1a10%22%2C%22orientation%22%3A%22portrait%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D'http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg'%2520viewBox%3D'0%25200%2520512%2520512'%253E%253Crect%2520width%3D'512'%2520height%3D'512'%2520fill%3D'%25230a1a10'%2520rx%3D'80'%2F%253E%253Ctext%2520x%3D'256'%2520y%3D'340'%2520font-family%3D'Arial'%2520font-size%3D'220'%2520font-weight%3D'bold'%2520fill%3D'%252376B746'%2520text-anchor%3D'middle'%253EC%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22512x512%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%2C%22purpose%22%3A%22any%20maskable%22%7D%5D%7D">
+<title>COACH — Marcus</title>
+<link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' fill='%230a1a10' rx='80'/><text x='256' y='340' font-family='Arial' font-size='220' font-weight='bold' fill='%2376B746' text-anchor='middle'>C</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #0a1a10;
+  --surf:    #0f2318;
+  --bdr:     #1a3a22;
+  --green:   #76B746;
+  --gdim:    #3A6B1F;
+  --white:   #f0f5f1;
+  --muted:   #4a6a52;
+  --warn:    #e8a020;
+  --danger:  #e05040;
+  --fast:    #e05040;
+  --slow:    #40c4d4;
+  --ok:      #76B746;
+  --mono:    'Space Mono', monospace;
+  --disp:    'Bebas Neue', sans-serif;
+  --body:    'DM Sans', sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;background:var(--bg);color:var(--white);font-family:var(--body);touch-action:manipulation}
+.screen{display:none;height:100vh;flex-direction:column}
+#workout,#done{overflow:hidden}
+.screen.active{display:flex}
+
+/* ── HOME ── */
+#home{background:radial-gradient(ellipse at 30% 20%,#1a3a22,#0a1a10 60%);justify-content:flex-start;overflow-y:auto;-webkit-overflow-scrolling:touch}
+.home-top{padding:44px 28px 16px}
+.home-top .lbl{font-family:var(--mono);font-size:10px;letter-spacing:3px;color:var(--muted);text-transform:uppercase;margin-bottom:6px}
+.home-top h1{font-family:var(--disp);font-size:54px;letter-spacing:2px;color:var(--green);line-height:1}
+.home-top .sub{font-size:13px;color:var(--muted);margin-top:4px;font-weight:300}
+.week-sel{padding:0 28px;flex:1;display:flex;flex-direction:column;justify-content:center;gap:10px}
+.week-row{display:flex;align-items:center;gap:12px}
+.wlbl{font-family:var(--mono);font-size:11px;color:var(--muted);width:52px}
+.week-nav{display:flex;align-items:center;background:var(--surf);border:1px solid var(--bdr);border-radius:8px;overflow:hidden}
+.week-nav button{background:none;border:none;color:var(--green);font-size:20px;width:44px;height:44px;cursor:pointer;font-family:var(--mono)}
+.week-nav button:active{background:var(--bdr)}
+#wdisp{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--white);min-width:52px;text-align:center}
+.cards{padding:0 28px 8px;display:flex;flex-direction:column;gap:8px;flex-shrink:0}
+.card{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:14px 16px;cursor:pointer;display:flex;align-items:center;gap:14px;transition:border-color .15s}
+.card:active,.card.sel{border-color:var(--green);background:#0f2a18}
+.cdot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.cinfo{flex:1;min-width:0}
+.cday{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+.cname{font-size:14px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}
+.cmeta{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:2px}
+.carr{color:var(--green);font-size:18px;opacity:.5}
+.start-btn{margin:12px 28px 40px;background:var(--green);color:#0a1a10;border:none;border-radius:14px;padding:18px;font-family:var(--disp);font-size:22px;letter-spacing:2px;width:calc(100% - 56px);cursor:pointer;transition:opacity .2s,transform .1s;flex-shrink:0;position:sticky;bottom:0}
+.start-btn:active{transform:scale(.98);opacity:.9}
+.start-btn:disabled{background:var(--bdr);color:var(--muted)}
+
+/* ── WORKOUT ── */
+#workout{background:var(--bg);position:relative;overflow:hidden}
+.wring{position:absolute;border-radius:50%;border:1px solid var(--bdr);pointer-events:none}
+.wring:nth-child(1){width:300px;height:300px;top:-80px;right:-80px;opacity:.35}
+.wring:nth-child(2){width:500px;height:500px;top:-160px;right:-160px;opacity:.15}
+
+.whdr{padding:24px 24px 12px;display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:2}
+.whdr-l .wlabel{font-family:var(--mono);font-size:9px;letter-spacing:3px;color:var(--muted);text-transform:uppercase}
+.whdr-l .wname{font-family:var(--disp);font-size:26px;letter-spacing:1px;color:var(--white);line-height:1.1;max-width:220px}
+.stop-btn{background:none;border:1px solid var(--bdr);color:var(--muted);border-radius:8px;padding:8px 14px;font-family:var(--mono);font-size:11px;cursor:pointer;letter-spacing:1px}
+.stop-btn:active{border-color:var(--danger);color:var(--danger)}
+
+.prog-wrap{padding:0 24px;position:relative;z-index:2}
+.prog-track{height:3px;background:var(--bdr);border-radius:2px;overflow:hidden}
+.prog-fill{height:100%;background:var(--green);border-radius:2px;transition:width 1s linear;width:0%}
+.prog-txt{font-family:var(--mono);font-size:10px;color:var(--muted);margin-top:6px;display:flex;justify-content:space-between}
+
+/* GPS bar */
+.gps-bar{margin:8px 24px 0;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:12px;position:relative;z-index:2}
+.gps-dot{width:8px;height:8px;border-radius:50%;background:var(--muted);flex-shrink:0;transition:background .3s}
+.gps-dot.ok{background:var(--ok)}
+.gps-dot.pulse{animation:gps-pulse 1.5s infinite}
+@keyframes gps-pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.gps-vals{display:flex;gap:16px;flex:1;align-items:center}
+.gps-item{text-align:center}
+.gps-val{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--white)}
+.gps-lbl{font-family:var(--mono);font-size:8px;letter-spacing:1px;color:var(--muted);text-transform:uppercase;margin-top:1px}
+
+/* Pace indicator */
+.pace-ind{display:flex;align-items:center;gap:6px;margin-left:auto}
+.pace-arrow{font-size:20px;font-weight:700;transition:color .3s}
+.pace-arrow.fast{color:var(--fast)}
+.pace-arrow.slow{color:var(--slow)}
+.pace-arrow.ok{color:var(--ok)}
+.pace-status{font-family:var(--mono);font-size:9px;letter-spacing:1px;text-transform:uppercase}
+.pace-status.fast{color:var(--fast)}
+.pace-status.slow{color:var(--slow)}
+.pace-status.ok{color:var(--ok)}
+
+/* Current block */
+.cur-block{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:12px 24px;position:relative;z-index:2}
+.blk-badge{font-family:var(--mono);font-size:10px;letter-spacing:3px;text-transform:uppercase;padding:5px 12px;border-radius:20px;margin-bottom:12px;border:1px solid}
+
+/* Speed display: target + real side by side */
+.speed-row{display:flex;align-items:flex-end;gap:20px;margin-bottom:4px}
+.speed-target{text-align:center}
+.speed-target-lbl{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:2px}
+.speed-target-val{font-family:var(--disp);font-size:80px;line-height:1;letter-spacing:-2px;color:var(--green)}
+.speed-target-unit{font-family:var(--mono);font-size:13px;color:var(--muted)}
+
+.speed-divider{font-family:var(--mono);font-size:28px;color:var(--bdr);margin-bottom:16px}
+
+.speed-real{text-align:center}
+.speed-real-lbl{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-bottom:2px}
+.speed-real-val{font-family:var(--disp);font-size:52px;line-height:1;letter-spacing:-1px;transition:color .4s;color:var(--muted)}
+.speed-real-val.fast{color:var(--fast)}
+.speed-real-val.slow{color:var(--slow)}
+.speed-real-val.ok{color:var(--ok)}
+.speed-real-unit{font-family:var(--mono);font-size:12px;color:var(--muted)}
+
+.blk-desc{font-size:13px;color:var(--muted);margin-top:4px;text-align:center;max-width:240px;line-height:1.5}
+
+/* Timer ring */
+.timer-wrap{position:relative;margin:12px 0 6px}
+.timer-wrap svg{transform:rotate(-90deg)}
+.trk{fill:none;stroke:var(--bdr);stroke-width:4}
+.tfill{fill:none;stroke:var(--green);stroke-width:4;stroke-linecap:round;transition:stroke-dashoffset 1s linear}
+.ttext{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.tsec{font-family:var(--disp);font-size:38px;letter-spacing:1px;color:var(--white);line-height:1}
+.tlbl{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase}
+
+/* Next */
+.next-row{margin:0 24px 12px;background:var(--surf);border:1px solid var(--bdr);border-radius:10px;padding:10px 14px;display:flex;align-items:center;gap:12px;position:relative;z-index:2}
+.nlbl{font-family:var(--mono);font-size:9px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;width:32px;flex-shrink:0}
+.nname{font-size:13px;font-weight:500}
+.nspd{font-family:var(--mono);font-size:11px;color:var(--muted);margin-top:2px}
+
+/* Step dots */
+.step-dots{display:flex;justify-content:center;gap:6px;padding:0 24px 24px;position:relative;z-index:2;flex-wrap:wrap}
+.sdot{width:6px;height:6px;border-radius:50%;background:var(--bdr);transition:background .3s,transform .3s}
+.sdot.done{background:var(--gdim)}
+.sdot.cur{background:var(--green);transform:scale(1.5)}
+
+/* Transition overlay */
+#toverlay{position:fixed;inset:0;background:var(--green);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:100;opacity:0;pointer-events:none;transition:opacity .2s}
+#toverlay.show{opacity:1;pointer-events:all}
+.t-big{font-family:var(--disp);font-size:80px;color:#0a1a10;letter-spacing:2px}
+.t-sub{font-family:var(--mono);font-size:13px;color:#0f2318;margin-top:6px;letter-spacing:2px}
+
+/* Done */
+#done{background:radial-gradient(ellipse at 50% 40%,#1a3a22,#0a1a10 70%);align-items:center;justify-content:center;text-align:center;padding:40px 32px;gap:14px}
+.done-ico{font-size:60px;line-height:1}
+.done-ttl{font-family:var(--disp);font-size:46px;letter-spacing:2px;color:var(--green)}
+.done-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;margin-top:4px}
+.dstat{background:var(--surf);border:1px solid var(--bdr);border-radius:12px;padding:14px 10px}
+.dval{font-family:var(--disp);font-size:26px;color:var(--green);letter-spacing:1px}
+.dlbl{font-family:var(--mono);font-size:8px;letter-spacing:2px;color:var(--muted);text-transform:uppercase;margin-top:3px}
+.done-back{background:var(--green);color:#0a1a10;border:none;border-radius:14px;padding:16px 40px;font-family:var(--disp);font-size:22px;letter-spacing:2px;cursor:pointer;margin-top:4px;width:100%}
+
+/* Type colors */
+.type-BASE        {color:#76B746;border-color:#3A6B1F;background:#0f2318}
+.type-REGENERATIVO{color:#52b87a;border-color:#1a5a3a;background:#0a2018}
+.type-CADÊNCIA    {color:#40c4d4;border-color:#1a4a5a;background:#081820}
+.type-FARTLEK     {color:#e8a020;border-color:#5a4010;background:#201808}
+.type-TEMPO       {color:#f0d040;border-color:#5a5010;background:#201c08}
+.type-TIRO        {color:#e05040;border-color:#5a2018;background:#200808}
+.type-LONGO       {color:#a080e0;border-color:#4a2880;background:#180820}
+.type-METABÓLICO  {color:#e07860;border-color:#5a3020;background:#200f08}
+.type-DESCANSO    {color:#606060;border-color:#303030;background:#101010}
+.type-PROVA       {color:#76B746;border-color:#76B746;background:#0f2318}
+.dot-BASE         {background:#76B746}
+.dot-REGENERATIVO {background:#52b87a}
+.dot-CADÊNCIA     {background:#40c4d4}
+.dot-FARTLEK      {background:#e8a020}
+.dot-TEMPO        {background:#f0d040}
+.dot-TIRO         {background:#e05040}
+.dot-LONGO        {background:#a080e0}
+.dot-METABÓLICO   {background:#e07860}
+.dot-DESCANSO     {background:#606060}
+.dot-PROVA        {background:#76B746}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div id="home" class="screen active">
+  <div class="home-top">
+    <div class="lbl">Running Coach</div>
+    <h1>COACH</h1>
+    <div class="sub">Marcus Voloch — Plano 2026</div>
+  </div>
+  <div class="week-sel">
+    <div class="week-row">
+      <span class="wlbl">SEMANA</span>
+      <div class="week-nav">
+        <button onclick="changeWeek(-1)">−</button>
+        <span id="wdisp">1</span>
+        <button onclick="changeWeek(1)">+</button>
+      </div>
+    </div>
+  </div>
+  <div class="cards" id="cards"></div>
+  <button class="start-btn" id="start-btn" onclick="startWorkout()" disabled>INICIAR TREINO</button>
+</div>
+
+<!-- WORKOUT -->
+<div id="workout" class="screen">
+  <div class="wring"></div><div class="wring"></div>
+  <div class="whdr">
+    <div class="whdr-l">
+      <div class="wlabel" id="w-wlbl">SEMANA 1 · TERÇA</div>
+      <div class="wname" id="w-name">BASE</div>
+    </div>
+    <button class="stop-btn" onclick="stopWorkout()">PARAR</button>
+  </div>
+  <div class="prog-wrap">
+    <div class="prog-track"><div class="prog-fill" id="prog-fill"></div></div>
+    <div class="prog-txt">
+      <span id="prog-done">0 / 0 blocos</span>
+      <span id="prog-elapsed">00:00</span>
+    </div>
+  </div>
+
+  <!-- GPS bar -->
+  <div class="gps-bar">
+    <div class="gps-dot" id="gps-dot"></div>
+    <div class="gps-vals">
+      <div class="gps-item">
+        <div class="gps-val" id="gps-speed">—</div>
+        <div class="gps-lbl">km/h real</div>
+      </div>
+      <div class="gps-item">
+        <div class="gps-val" id="gps-pace">—</div>
+        <div class="gps-lbl">pace real</div>
+      </div>
+      <div class="gps-item">
+        <div class="gps-val" id="gps-dist">0.00</div>
+        <div class="gps-lbl">km total</div>
+      </div>
+    </div>
+    <div class="pace-ind">
+      <div class="pace-arrow ok" id="pace-arrow">→</div>
+      <div class="pace-status ok" id="pace-status">NO ALVO</div>
+    </div>
+  </div>
+
+  <div class="cur-block">
+    <div class="blk-badge" id="blk-badge">BASE</div>
+
+    <div class="speed-row">
+      <!-- Target speed -->
+      <div class="speed-target">
+        <div class="speed-target-lbl">alvo</div>
+        <div class="speed-target-val" id="tgt-speed">9.0</div>
+        <div class="speed-target-unit">km/h</div>
+      </div>
+
+      <div class="speed-divider">|</div>
+
+      <!-- Real speed from GPS -->
+      <div class="speed-real">
+        <div class="speed-real-lbl">atual</div>
+        <div class="speed-real-val" id="real-speed">—</div>
+        <div class="speed-real-unit">km/h</div>
+      </div>
+    </div>
+
+    <div class="blk-desc" id="blk-desc">Aguardando GPS...</div>
+
+    <div class="timer-wrap">
+      <svg width="110" height="110" viewBox="0 0 110 110">
+        <circle class="trk" cx="55" cy="55" r="50"/>
+        <circle class="tfill" id="tring" cx="55" cy="55" r="50"
+          stroke-dasharray="314.2" stroke-dashoffset="0"/>
+      </svg>
+      <div class="ttext">
+        <div class="tsec" id="tsec">0:00</div>
+        <div class="tlbl">restam</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="next-row" id="next-row">
+    <div class="nlbl">PRÓX</div>
+    <div>
+      <div class="nname" id="next-name">—</div>
+      <div class="nspd" id="next-spd">—</div>
+    </div>
+  </div>
+
+  <div class="step-dots" id="sdots"></div>
+</div>
+
+<!-- DONE -->
+<div id="done" class="screen">
+  <div class="done-ico">✓</div>
+  <div class="done-ttl">TREINO<br>CONCLUÍDO</div>
+  <div class="done-stats">
+    <div class="dstat"><div class="dval" id="d-dur">00:00</div><div class="dlbl">Duração</div></div>
+    <div class="dstat"><div class="dval" id="d-dist">0.00</div><div class="dlbl">km (GPS)</div></div>
+    <div class="dstat"><div class="dval" id="d-pace">—</div><div class="dlbl">Pace médio</div></div>
+    <div class="dstat"><div class="dval" id="d-week">S1</div><div class="dlbl">Semana</div></div>
+  </div>
+  <button class="done-back" onclick="goHome()">VOLTAR</button>
+</div>
+
+<!-- TRANSITION -->
+<div id="toverlay">
+  <div class="t-big" id="t-spd">9.0</div>
+  <div class="t-sub" id="t-desc">km/h</div>
+</div>
+
+<script>
+// ── PLAN DATA (same as v1, condensed) ────────────────────────────────────────
+function rep(n,steps){const o=[];for(let i=0;i<n;i++)o.push(...steps);return o}
+const PLAN={};
+function add(s,d,t,n,steps){if(!PLAN[s])PLAN[s]=[];PLAN[s].push({day:d,type:t,name:n,steps})}
+
+// FASE 1
+add(1,'SEG','METABÓLICO','Metabólico Incl 6%',[{name:'Aquecimento',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,0km/h — Incl 6%',duration:2100,speed:6.0,intensity:'ACTIVE'},{name:'Esfriamento',duration:300,speed:5.0,intensity:'COOLDOWN'}]);
+add(1,'TER','BASE','Base — 1min/2min × 8',[{name:'Aquecimento',duration:300,speed:5.5,intensity:'WARMUP'},...rep(8,[{name:'Correr 9,0 km/h',duration:60,speed:9.0,intensity:'ACTIVE'},{name:'Andar 6,0 km/h',duration:120,speed:6.0,intensity:'RECOVERY'}]),{name:'Esfriamento',duration:300,speed:5.5,intensity:'COOLDOWN'}]);
+add(1,'QUI','CADÊNCIA','Cadência 170spm',[{name:'Aquecimento',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Cadência 170spm — 7,0km/h',duration:2100,speed:7.0,intensity:'ACTIVE'},{name:'Esfriamento',duration:300,speed:6.0,intensity:'COOLDOWN'}]);
+add(1,'SÁB','LONGO','Longo 5km Calçadão',[{name:'Caminhada',duration:600,speed:6.0,intensity:'WARMUP'},...rep(3,[{name:'Correr 9,0 km/h',duration:120,speed:9.0,intensity:'ACTIVE'},{name:'Andar 6,0 km/h',duration:300,speed:6.0,intensity:'RECOVERY'}]),{name:'Esfriamento',duration:600,speed:6.0,intensity:'COOLDOWN'}]);
+add(2,'SEG','METABÓLICO','Metabólico Incl 7%',[{name:'Aquecimento',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,0km/h — Incl 7%',duration:2220,speed:6.0,intensity:'ACTIVE'},{name:'Esfriamento',duration:300,speed:5.0,intensity:'COOLDOWN'}]);
+add(2,'TER','BASE','Base — 1min/2min × 10',[{name:'Aquecimento',duration:300,speed:5.5,intensity:'WARMUP'},...rep(10,[{name:'Correr 9,0 km/h',duration:60,speed:9.0,intensity:'ACTIVE'},{name:'Andar 6,0 km/h',duration:120,speed:6.0,intensity:'RECOVERY'}]),{name:'Esfriamento',duration:300,speed:5.5,intensity:'COOLDOWN'}]);
+add(2,'QUI','CADÊNCIA','Cadência 172spm',[{name:'Aquecimento',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Cadência 172spm — 7,0km/h',duration:2220,speed:7.0,intensity:'ACTIVE'},{name:'Esfriamento',duration:300,speed:6.0,intensity:'COOLDOWN'}]);
+add(2,'SÁB','LONGO','Longo 5,5km',[{name:'Aquecimento',duration:300,speed:6.0,intensity:'WARMUP'},...rep(5,[{name:'Correr 9,0 km/h',duration:300,speed:9.0,intensity:'ACTIVE'},{name:'Andar 6,0 km/h',duration:60,speed:6.0,intensity:'RECOVERY'}]),{name:'Esfriamento',duration:300,speed:6.0,intensity:'COOLDOWN'}]);
+add(3,'SEG','METABÓLICO','Metabólico Incl 7%',[{name:'Aquecimento',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h — Incl 7%',duration:2280,speed:6.5,intensity:'ACTIVE'},{name:'Esfriamento',duration:300,speed:5.0,intensity:'COOLDOWN'}]);
+add(3,'TER','BASE','Base — 2min/1min × 8',[{name:'Aquecimento',duration:300,speed:6.0,intensity:'WARMUP'},...rep(8,[{name:'Correr 9,0 km/h',duration:120,speed:9.0,intensity:'ACTIVE'},{name:'Andar 6,0 km/h',duration:60,speed:6.0,intensity:'RECOVERY'}]),{name:'Esfriamento',duration:300,speed:6.0,intensity:'COOLDOWN'}]);
+add(3,'QUI','CADÊNCIA','Cadência 172spm incl 0,5%',[{name:'Aquecimento',duration:300,speed:6.5,intensity:'WARMUP'},{name:'Cadência 172spm — 7,5km/h',duration:2280,speed:7.5,intensity:'ACTIVE'},{name:'Esfriamento',duration:300,speed:6.5,intensity:'COOLDOWN'}]);
+add(3,'SÁB','LONGO','Longo 6km',[{name:'Aquecimento',duration:300,speed:6.0,intensity:'WARMUP'},...rep(6,[{name:'Correr 9,0 km/h',duration:300,speed:9.0,intensity:'ACTIVE'},{name:'Andar 6,0 km/h',duration:60,speed:6.0,intensity:'RECOVERY'}]),{name:'Esfriamento',duration:300,speed:6.0,intensity:'COOLDOWN'}]);
+// Semanas 4-9
+[[4,'SEG','METABÓLICO','Metabólico Incl 7% leve',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,0km/h Incl 7%',duration:2100,speed:6.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [4,'TER','REGENERATIVO','Regenerativo 4km',[{name:'Regenerativo 6,5km/h',duration:2215,speed:6.5,intensity:'ACTIVE'}]],
+ [4,'QUI','BASE','Base 3min/1min × 7',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},...rep(7,[{name:'Correr 9,0 km/h',duration:180,speed:9.0,intensity:'ACTIVE'},{name:'Andar 6,0 km/h',duration:60,speed:6.0,intensity:'RECOVERY'}]),{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [4,'SÁB','LONGO','Longo 6,5km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},...rep(5,[{name:'Correr 9,0 km/h',duration:360,speed:9.0,intensity:'ACTIVE'},{name:'Andar 6,0 km/h',duration:60,speed:6.0,intensity:'RECOVERY'}]),{name:'Final 9,0km/h',duration:800,speed:9.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [5,'SEG','METABÓLICO','Metabólico Incl 8%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,0km/h Incl 8%',duration:2400,speed:6.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [5,'TER','BASE','Base 5min/1min × 6',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},...rep(6,[{name:'Correr 9,0 km/h',duration:300,speed:9.0,intensity:'ACTIVE'},{name:'Andar 6,0 km/h',duration:60,speed:6.0,intensity:'RECOVERY'}]),{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [5,'QUI','FARTLEK','Fartlek 5×1min',[{name:'Aq 8,0km/h',duration:450,speed:8.0,intensity:'WARMUP'},...rep(5,[{name:'RÁPIDO 10,5km/h',duration:60,speed:10.5,intensity:'ACTIVE'},{name:'Lento 8,0km/h',duration:120,speed:8.0,intensity:'RECOVERY'}]),{name:'Esf 8,0km/h',duration:450,speed:8.0,intensity:'COOLDOWN'}]],
+ [5,'SÁB','LONGO','Longo 7km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},...rep(4,[{name:'Correr 9,0 km/h',duration:480,speed:9.0,intensity:'ACTIVE'},{name:'Andar 6,0 km/h',duration:60,speed:6.0,intensity:'RECOVERY'}]),{name:'Final 9,0km/h',duration:600,speed:9.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [6,'SEG','METABÓLICO','Metabólico Incl 8%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 8%',duration:2400,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [6,'TER','CADÊNCIA','Cadência 174spm',[{name:'Aq',duration:300,speed:6.5,intensity:'WARMUP'},{name:'Cadência 174spm — 7,5km/h',duration:2400,speed:7.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.5,intensity:'COOLDOWN'}]],
+ [6,'QUI','BASE','Base 5,5km contínuos',[{name:'Aq',duration:300,speed:7.0,intensity:'WARMUP'},{name:'Base 9,0km/h',duration:2200,speed:9.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.0,intensity:'COOLDOWN'}]],
+ [6,'SÁB','LONGO','Longo 7,5km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},...rep(3,[{name:'Correr 9,0 km/h',duration:600,speed:9.0,intensity:'ACTIVE'},{name:'Andar 6,0 km/h',duration:60,speed:6.0,intensity:'RECOVERY'}]),{name:'Final 9,0km/h',duration:600,speed:9.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [7,'SEG','METABÓLICO','Metabólico Incl 8%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 8%',duration:2520,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [7,'TER','BASE','Base 6km contínuos',[{name:'Aq',duration:300,speed:7.0,intensity:'WARMUP'},{name:'Base 9,0km/h contínuo',duration:2400,speed:9.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.0,intensity:'COOLDOWN'}]],
+ [7,'QUI','FARTLEK','Fartlek 6×1,5min',[{name:'Aq 8,5km/h',duration:450,speed:8.5,intensity:'WARMUP'},...rep(6,[{name:'RÁPIDO 11,0km/h',duration:90,speed:11.0,intensity:'ACTIVE'},{name:'Lento 8,5km/h',duration:120,speed:8.5,intensity:'RECOVERY'}]),{name:'Esf 8,5km/h',duration:450,speed:8.5,intensity:'COOLDOWN'}]],
+ [7,'SÁB','LONGO','Longo 8km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},...rep(3,[{name:'Correr 9,0 km/h',duration:720,speed:9.0,intensity:'ACTIVE'},{name:'Andar 6,0 km/h',duration:60,speed:6.0,intensity:'RECOVERY'}]),{name:'Final 9,0km/h',duration:600,speed:9.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [8,'SEG','METABÓLICO','Metabólico leve Incl 7%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,0km/h Incl 7%',duration:2100,speed:6.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [8,'TER','REGENERATIVO','Regenerativo 4km',[{name:'Regenerativo 6,5km/h',duration:2215,speed:6.5,intensity:'ACTIVE'}]],
+ [8,'QUI','BASE','Base 6km contínuos',[{name:'Aq',duration:300,speed:7.0,intensity:'WARMUP'},{name:'Base 9,0km/h',duration:2350,speed:9.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.0,intensity:'COOLDOWN'}]],
+ [8,'SÁB','LONGO','MARCO: 8km contínuos',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,0km/h contínuo',duration:3200,speed:9.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [9,'SEG','METABÓLICO','Metabólico Incl 8%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 8%',duration:2520,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [9,'TER','BASE','Base 5km contínuos',[{name:'Aq',duration:300,speed:7.0,intensity:'WARMUP'},{name:'Base 9,0km/h',duration:2000,speed:9.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.0,intensity:'COOLDOWN'}]],
+ [9,'QUI','CADÊNCIA','Cadência 175spm teste',[{name:'Aq',duration:300,speed:7.0,intensity:'WARMUP'},{name:'Cadência 175spm — 7,5km/h',duration:2520,speed:7.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.0,intensity:'COOLDOWN'}]],
+ [9,'SÁB','LONGO','MARCO: 9km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,0km/h',duration:3600,speed:9.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]]
+].forEach(([s,d,t,n,st])=>add(s,d,t,n,st));
+
+// Semanas 10-38: estrutura completa
+[[10,'SEG','METABÓLICO','Metabólico Incl 8%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 8%',duration:2520,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [10,'TER','REGENERATIVO','Regenerativo 5km',[{name:'Regenerativo 6,5km/h',duration:2770,speed:6.5,intensity:'ACTIVE'}]],
+ [10,'QUI','BASE','Base 7km',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,2km/h',duration:2740,speed:9.2,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [10,'SÁB','LONGO','MARCO: Primeiro 10km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,1km/h',duration:3956,speed:9.1,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [11,'SEG','METABÓLICO','Metabólico Incl 9%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 9%',duration:2580,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [11,'TER','BASE','Base 7km',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,2km/h',duration:2740,speed:9.2,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [11,'QUI','FARTLEK','Fartlek 6×2min',[{name:'Aq 8,5km/h',duration:540,speed:8.5,intensity:'WARMUP'},...rep(6,[{name:'RÁPIDO 11,0km/h',duration:120,speed:11.0,intensity:'ACTIVE'},{name:'Lento 8,5km/h',duration:120,speed:8.5,intensity:'RECOVERY'}]),{name:'Esf 8,5km/h',duration:540,speed:8.5,intensity:'COOLDOWN'}]],
+ [11,'SÁB','LONGO','Longo 10km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,2km/h',duration:3913,speed:9.2,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [12,'SEG','METABÓLICO','Metabólico Incl 9%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 9%',duration:2580,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [12,'TER','CADÊNCIA','Cadência 175spm',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Cadência 175spm 8,0km/h',duration:2520,speed:8.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [12,'QUI','BASE','Base 7,5km',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,2km/h',duration:2935,speed:9.2,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [12,'SÁB','LONGO','Longo 10km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,2km/h',duration:3913,speed:9.2,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [13,'SEG','METABÓLICO','Metabólico Incl 9%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 9%',duration:2580,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [13,'TER','BASE','Base 7km',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,2km/h',duration:2740,speed:9.2,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [13,'QUI','FARTLEK','Fartlek 7×2min',[{name:'Aq 8,5km/h',duration:540,speed:8.5,intensity:'WARMUP'},...rep(7,[{name:'RÁPIDO 11,0km/h',duration:120,speed:11.0,intensity:'ACTIVE'},{name:'Lento 8,5km/h',duration:120,speed:8.5,intensity:'RECOVERY'}]),{name:'Esf 8,5km/h',duration:360,speed:8.5,intensity:'COOLDOWN'}]],
+ [13,'SÁB','LONGO','Longo 10,5km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,2km/h',duration:4109,speed:9.2,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [14,'SEG','METABÓLICO','Metabólico Incl 9%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 9%',duration:2520,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [14,'TER','REGENERATIVO','Regenerativo 5km',[{name:'Regenerativo 6,5km/h',duration:2770,speed:6.5,intensity:'ACTIVE'}]],
+ [14,'QUI','BASE','Base 8km',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,3km/h',duration:3096,speed:9.3,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [14,'SÁB','LONGO','Longo 11km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,2km/h',duration:4304,speed:9.2,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [15,'SEG','METABÓLICO','Metabólico Incl 9% vel 7,0',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 9%',duration:2580,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [15,'TER','BASE','Base 8km',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,5km/h',duration:3032,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [15,'QUI','FARTLEK','Fartlek 5×3min',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},...rep(5,[{name:'RÁPIDO 11,0km/h',duration:180,speed:11.0,intensity:'ACTIVE'},{name:'Lento 8,5km/h',duration:120,speed:8.5,intensity:'RECOVERY'}]),{name:'Esf 8,5km/h',duration:360,speed:8.5,intensity:'COOLDOWN'}]],
+ [15,'SÁB','LONGO','Longo 11km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,3km/h',duration:4258,speed:9.3,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [16,'SEG','METABÓLICO','Metabólico Incl 9% vel 7,0',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 9%',duration:2700,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [16,'TER','CADÊNCIA','Cadência 175-178spm',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Cadência 176spm 8,0km/h',duration:2700,speed:8.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [16,'QUI','BASE','Base 8,5km',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,5km/h',duration:3221,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [16,'SÁB','LONGO','MARCO: Primeiro 12km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,2km/h',duration:4696,speed:9.2,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [17,'SEG','METABÓLICO','Metabólico leve pós marco',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 8%',duration:2520,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [17,'TER','REGENERATIVO','Regenerativo 5km',[{name:'Regenerativo 6,5km/h',duration:2770,speed:6.5,intensity:'ACTIVE'}]],
+ [17,'QUI','BASE','Base 8km',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,2km/h',duration:3130,speed:9.2,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [17,'SÁB','LONGO','Longo 10km recuperação',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,2km/h',duration:3913,speed:9.2,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [18,'SEG','METABÓLICO','Metabólico Incl 9%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 9%',duration:2700,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [18,'TER','BASE','Base 8km',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,5km/h',duration:3032,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [18,'QUI','TEMPO','Tempo 4km @ 9,5km/h',[{name:'Aq 8,5km/h',duration:636,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 9,5km/h',duration:1516,speed:9.5,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:636,speed:8.5,intensity:'COOLDOWN'}]],
+ [18,'SÁB','LONGO','Longo 12km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,3km/h',duration:4645,speed:9.3,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [19,'SEG','METABÓLICO','Metabólico Incl 9%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 9%',duration:2700,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [19,'TER','CADÊNCIA','Cadência 176-178spm',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Cadência 177spm 8,0km/h',duration:2700,speed:8.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [19,'QUI','TEMPO','Tempo 5km @ 9,5km/h',[{name:'Aq 8,5km/h',duration:636,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 9,5km/h',duration:1895,speed:9.5,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:636,speed:8.5,intensity:'COOLDOWN'}]],
+ [19,'SÁB','LONGO','Longo 12,5km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,5km/h',duration:4737,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [20,'SEG','METABÓLICO','Metabólico Incl 10%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 10%',duration:2700,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [20,'TER','BASE','Base 8,5km',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,5km/h',duration:3221,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [20,'QUI','FARTLEK','Fartlek 6×3min',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},...rep(6,[{name:'RÁPIDO 11,0km/h',duration:180,speed:11.0,intensity:'ACTIVE'},{name:'Lento 8,5km/h',duration:120,speed:8.5,intensity:'RECOVERY'}]),{name:'Esf 8,5km/h',duration:360,speed:8.5,intensity:'COOLDOWN'}]],
+ [20,'SÁB','LONGO','MARCO: 13km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,3km/h',duration:5032,speed:9.3,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [21,'SEG','METABÓLICO','Metabólico Incl 10%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 10%',duration:2700,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [21,'TER','TIRO','Tiro 8×20seg @ 12km/h',[{name:'Aq 8,5km/h',duration:540,speed:8.5,intensity:'WARMUP'},...rep(8,[{name:'TIRO 12,0km/h',duration:20,speed:12.0,intensity:'ACTIVE'},{name:'Rec 7,0km/h',duration:90,speed:7.0,intensity:'RECOVERY'}]),{name:'Esf 8,5km/h',duration:540,speed:8.5,intensity:'COOLDOWN'}]],
+ [21,'QUI','TEMPO','Tempo 5km @ 9,8km/h',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 9,8km/h',duration:1837,speed:9.8,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:720,speed:8.5,intensity:'COOLDOWN'}]],
+ [21,'SÁB','LONGO','Longo 12km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,5km/h',duration:4547,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [22,'SEG','METABÓLICO','Metabólico Incl 9%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 9%',duration:2580,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [22,'TER','REGENERATIVO','Regenerativo 6km',[{name:'Regenerativo 6,5km/h',duration:3323,speed:6.5,intensity:'ACTIVE'}]],
+ [22,'QUI','FARTLEK','Fartlek 7×3min',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},...rep(7,[{name:'RÁPIDO 11,0km/h',duration:180,speed:11.0,intensity:'ACTIVE'},{name:'Lento 8,5km/h',duration:120,speed:8.5,intensity:'RECOVERY'}]),{name:'Esf 8,5km/h',duration:360,speed:8.5,intensity:'COOLDOWN'}]],
+ [22,'SÁB','LONGO','Longo 13km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,5km/h',duration:4926,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [23,'SEG','METABÓLICO','Metabólico Incl 10%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 10%',duration:2700,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [23,'TER','TIRO','Tiro 10×20seg @ 12km/h',[{name:'Aq 8,5km/h',duration:540,speed:8.5,intensity:'WARMUP'},...rep(10,[{name:'TIRO 12,0km/h',duration:20,speed:12.0,intensity:'ACTIVE'},{name:'Rec 7,0km/h',duration:90,speed:7.0,intensity:'RECOVERY'}]),{name:'Esf 8,5km/h',duration:540,speed:8.5,intensity:'COOLDOWN'}]],
+ [23,'QUI','TEMPO','Tempo 6km @ 10,0km/h',[{name:'Aq 8,5km/h',duration:540,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 10,0km/h',duration:2160,speed:10.0,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:540,speed:8.5,intensity:'COOLDOWN'}]],
+ [23,'SÁB','LONGO','MARCO: 14km pico',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,5km/h PICO',duration:5305,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [24,'SEG','METABÓLICO','Metabólico Incl 9%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 9%',duration:2580,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [24,'TER','REGENERATIVO','Regenerativo 6km',[{name:'Regenerativo 6,5km/h',duration:3323,speed:6.5,intensity:'ACTIVE'}]],
+ [24,'QUI','BASE','Base 8km',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,2km/h',duration:3130,speed:9.2,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [24,'SÁB','LONGO','Longo 12km recuperação',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,5km/h',duration:4547,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [25,'SEG','METABÓLICO','Metabólico Incl 10%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 10%',duration:2700,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [25,'TER','BASE','Base 8km',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,5km/h',duration:3032,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [25,'QUI','TEMPO','Tempo 6km @ 10,0km/h',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 10,0km/h',duration:2160,speed:10.0,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:720,speed:8.5,intensity:'COOLDOWN'}]],
+ [25,'SÁB','LONGO','Longo 13km',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,5km/h',duration:4926,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [26,'SEG','METABÓLICO','Metabólico Incl 10%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 10%',duration:2700,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [26,'TER','REGENERATIVO','Regenerativo 6km',[{name:'Regenerativo 6,5km/h',duration:3323,speed:6.5,intensity:'ACTIVE'}]],
+ [26,'QUI','TEMPO','Tempo 6km @ 10,2km/h',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 10,2km/h',duration:2118,speed:10.2,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:720,speed:8.5,intensity:'COOLDOWN'}]],
+ [26,'SÁB','LONGO','Longo 13km @ 9,7km/h',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,7km/h',duration:4825,speed:9.7,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [27,'SEG','METABÓLICO','Metabólico Incl 10%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 10%',duration:2700,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [27,'TER','TIRO','Tiro 8×30seg @ 12km/h',[{name:'Aq 8,5km/h',duration:540,speed:8.5,intensity:'WARMUP'},...rep(8,[{name:'TIRO 12,0km/h',duration:30,speed:12.0,intensity:'ACTIVE'},{name:'Rec 7,0km/h',duration:120,speed:7.0,intensity:'RECOVERY'}]),{name:'Esf 8,5km/h',duration:540,speed:8.5,intensity:'COOLDOWN'}]],
+ [27,'QUI','TEMPO','Tempo 7km @ 10,2km/h',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 10,2km/h',duration:2471,speed:10.2,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:720,speed:8.5,intensity:'COOLDOWN'}]],
+ [27,'SÁB','LONGO','Longo 13km @ 9,8km/h',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,8km/h',duration:4776,speed:9.8,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [28,'SEG','METABÓLICO','Metabólico Incl 10%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 10%',duration:2700,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [28,'TER','BASE','Base 8km',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,5km/h',duration:3032,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [28,'QUI','TEMPO','Tempo 7km @ 10,3km/h PACE PROVA',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},{name:'TEMPO PACE PROVA 10,3km/h',duration:2447,speed:10.3,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:720,speed:8.5,intensity:'COOLDOWN'}]],
+ [28,'SÁB','LONGO','Longo 14km @ 9,8km/h',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,8km/h',duration:5143,speed:9.8,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [29,'SEG','METABÓLICO','Metabólico Incl 10%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 10%',duration:2700,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [29,'TER','TIRO','Tiro 10×30seg @ 12km/h',[{name:'Aq 8,5km/h',duration:540,speed:8.5,intensity:'WARMUP'},...rep(10,[{name:'TIRO 12,0km/h',duration:30,speed:12.0,intensity:'ACTIVE'},{name:'Rec 7,0km/h',duration:90,speed:7.0,intensity:'RECOVERY'}]),{name:'Esf 8,5km/h',duration:540,speed:8.5,intensity:'COOLDOWN'}]],
+ [29,'QUI','TEMPO','Tempo 7km @ 10,3km/h',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 10,3km/h',duration:2447,speed:10.3,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:720,speed:8.5,intensity:'COOLDOWN'}]],
+ [29,'SÁB','LONGO','Longo 14km @ 10,0km/h',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 10,0km/h',duration:5040,speed:10.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [30,'SEG','METABÓLICO','Metabólico Incl 10%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 10%',duration:2700,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [30,'TER','REGENERATIVO','Regenerativo 6km',[{name:'Regenerativo 6,5km/h',duration:3323,speed:6.5,intensity:'ACTIVE'}]],
+ [30,'QUI','TEMPO','Tempo 7km @ 10,3km/h',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 10,3km/h',duration:2447,speed:10.3,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:720,speed:8.5,intensity:'COOLDOWN'}]],
+ [30,'SÁB','LONGO','Longo 14km @ 10,0km/h',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 10,0km/h',duration:5040,speed:10.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [31,'SEG','METABÓLICO','Metabólico Incl 10%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 10%',duration:2700,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [31,'TER','TIRO','Tiro 12×30seg @ 12km/h PICO',[{name:'Aq 8,5km/h',duration:540,speed:8.5,intensity:'WARMUP'},...rep(12,[{name:'TIRO 12,0km/h',duration:30,speed:12.0,intensity:'ACTIVE'},{name:'Rec 7,0km/h',duration:90,speed:7.0,intensity:'RECOVERY'}]),{name:'Esf 8,5km/h',duration:540,speed:8.5,intensity:'COOLDOWN'}]],
+ [31,'QUI','TEMPO','Tempo 8km @ 10,3km/h PICO',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 10,3km/h PICO',duration:2797,speed:10.3,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:720,speed:8.5,intensity:'COOLDOWN'}]],
+ [31,'SÁB','LONGO','PICO: 15km @ 10,0km/h',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 10,0km/h PICO',duration:5400,speed:10.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [32,'SEG','METABÓLICO','Metabólico leve pós pico',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 9%',duration:2580,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [32,'TER','REGENERATIVO','Regenerativo 5km pós pico',[{name:'Regenerativo 6,5km/h',duration:2770,speed:6.5,intensity:'ACTIVE'}]],
+ [32,'QUI','TEMPO','Tempo 5km @ 10,3km/h',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 10,3km/h',duration:1748,speed:10.3,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:720,speed:8.5,intensity:'COOLDOWN'}]],
+ [32,'SÁB','LONGO','Longo 12km recuperação',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,8km/h',duration:4408,speed:9.8,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [33,'SEG','METABÓLICO','Metabólico Incl 10%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 10%',duration:2700,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [33,'TER','TIRO','Tiro 10×30seg @ 12km/h',[{name:'Aq 8,5km/h',duration:540,speed:8.5,intensity:'WARMUP'},...rep(10,[{name:'TIRO 12,0km/h',duration:30,speed:12.0,intensity:'ACTIVE'},{name:'Rec 7,0km/h',duration:90,speed:7.0,intensity:'RECOVERY'}]),{name:'Esf 8,5km/h',duration:540,speed:8.5,intensity:'COOLDOWN'}]],
+ [33,'QUI','TEMPO','Tempo 8km @ 10,3km/h',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 10,3km/h',duration:2797,speed:10.3,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:720,speed:8.5,intensity:'COOLDOWN'}]],
+ [33,'SÁB','LONGO','Longo 14km @ 10,0km/h',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 10,0km/h',duration:5040,speed:10.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [34,'SEG','METABÓLICO','Metabólico pré-taper',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 7,0km/h Incl 9%',duration:2580,speed:7.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [34,'TER','BASE','Base 8km avaliação',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,5km/h avaliação',duration:3032,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [34,'QUI','TEMPO','Tempo 6km @ 10,3km/h pré-taper',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 10,3km/h',duration:2097,speed:10.3,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:720,speed:8.5,intensity:'COOLDOWN'}]],
+ [34,'SÁB','LONGO','Longo 12km @ 10,2km/h',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 10,2km/h',duration:4235,speed:10.2,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [35,'SEG','METABÓLICO','Metabólico taper Incl 8%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 8%',duration:2100,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [35,'TER','BASE','Base 6km taper',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base 9,5km/h',duration:2274,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [35,'QUI','TEMPO','Tempo 4km @ 10,3km/h taper',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 10,3km/h',duration:1398,speed:10.3,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:720,speed:8.5,intensity:'COOLDOWN'}]],
+ [35,'SÁB','LONGO','Longo 10km taper',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,8km/h',duration:3673,speed:9.8,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [36,'SEG','METABÓLICO','Metabólico taper profundo',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,5km/h Incl 7%',duration:1800,speed:6.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [36,'TER','REGENERATIVO','Regenerativo 4km taper',[{name:'Regenerativo 6,5km/h',duration:2215,speed:6.5,intensity:'ACTIVE'}]],
+ [36,'QUI','TEMPO','Tempo 3km @ 10,3km/h taper',[{name:'Aq 8,5km/h',duration:360,speed:8.5,intensity:'WARMUP'},{name:'TEMPO 10,3km/h',duration:1049,speed:10.3,intensity:'ACTIVE'},{name:'Esf 8,5km/h',duration:720,speed:8.5,intensity:'COOLDOWN'}]],
+ [36,'SÁB','LONGO','Longo 8km taper profundo',[{name:'Aq',duration:300,speed:6.0,intensity:'WARMUP'},{name:'Longo 9,5km/h',duration:3032,speed:9.5,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:6.0,intensity:'COOLDOWN'}]],
+ [37,'SEG','METABÓLICO','Metabólico leve Incl 6%',[{name:'Aq',duration:300,speed:5.5,intensity:'WARMUP'},{name:'Metabólico 6,0km/h Incl 6%',duration:1500,speed:6.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:5.0,intensity:'COOLDOWN'}]],
+ [37,'TER','BASE','Base leve 4km',[{name:'Aq',duration:300,speed:7.5,intensity:'WARMUP'},{name:'Base leve 9,0km/h',duration:1600,speed:9.0,intensity:'ACTIVE'},{name:'Esf',duration:300,speed:7.5,intensity:'COOLDOWN'}]],
+ [37,'QUI','TIRO','Ativação 6×20seg @ 12km/h',[{name:'Aq 8,0km/h',duration:360,speed:8.0,intensity:'WARMUP'},...rep(6,[{name:'TIRO 12,0km/h',duration:20,speed:12.0,intensity:'ACTIVE'},{name:'Rec 7,0km/h',duration:120,speed:7.0,intensity:'RECOVERY'}]),{name:'Esf 8,0km/h',duration:360,speed:8.0,intensity:'COOLDOWN'}]],
+ [37,'SÁB','DESCANSO','Descanso total',[{name:'Descanso — caminhada leve opcional',duration:1800,speed:5.0,intensity:'ACTIVE'}]],
+ [38,'TER','REGENERATIVO','Regenerativo 2km ativação',[{name:'Regenerativo leve 8,0km/h',duration:900,speed:8.0,intensity:'ACTIVE'}]],
+ [38,'QUI','DESCANSO','Descanso pré-prova',[{name:'Descanso total',duration:60,speed:0,intensity:'ACTIVE'}]],
+ [38,'SÁB','PROVA','PROVA — 12km @ 5:50/km',[{name:'Saída conservadora 9,8km/h',duration:1102,speed:9.8,intensity:'WARMUP'},{name:'RITMO DE PROVA 10,3km/h',duration:2524,speed:10.3,intensity:'ACTIVE'},{name:'FINAL FORTE 10,5km/h',duration:686,speed:10.5,intensity:'ACTIVE'}]]
+].forEach(([s,d,t,n,st])=>add(s,d,t,n,st));
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let cWeek=1, selIdx=null, active=false;
+let stepIdx=0, stepRemain=0, totalElapsed=0, timerIv=null;
+let gpsWatch=null, realSpeed=0, totalDist=0, lastPos=null;
+let totalDur=0;
+const speedBuffer=[];
+const SPEED_TOL=0.8; // km/h tolerance for "on target"
+
+const DAY_ORDER=['SEG','TER','QUI','SÁB'];
+const DAY_FULL={SEG:'SEGUNDA',TER:'TERÇA',QUI:'QUINTA',SÁB:'SÁBADO'};
+
+// ── AUDIO ─────────────────────────────────────────────────────────────────────
+let actx=null;
+function beep(f=880,d=0.15,v=0.4){
+  try{
+    if(!actx)actx=new(window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(),g=actx.createGain();
+    o.connect(g);g.connect(actx.destination);
+    o.frequency.value=f;g.gain.setValueAtTime(v,actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001,actx.currentTime+d);
+    o.start();o.stop(actx.currentTime+d);
+  }catch(e){}
+}
+function alertChange(){
+  beep(660,.1);setTimeout(()=>beep(880,.15),130);setTimeout(()=>beep(1100,.25),280);
+  if(navigator.vibrate)navigator.vibrate([100,50,100,50,200]);
+}
+function alertWarn(){beep(440,.08);if(navigator.vibrate)navigator.vibrate(80)}
+
+// ── HELPERS ───────────────────────────────────────────────────────────────────
+function show(id){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active')}
+function fmt(s){return`${Math.floor(s/60)}:${String(s%60).padStart(2,'0')}`}
+function typeColor(t){return{BASE:'#76B746',REGENERATIVO:'#52b87a',CADÊNCIA:'#40c4d4',FARTLEK:'#e8a020',TEMPO:'#f0d040',TIRO:'#e05040',LONGO:'#a080e0',METABÓLICO:'#e07860',DESCANSO:'#606060',PROVA:'#76B746'}[t]||'#76B746'}
+function getSorted(){return[...(PLAN[cWeek]||[])].sort((a,b)=>DAY_ORDER.indexOf(a.day)-DAY_ORDER.indexOf(b.day))}
+
+// ── GPS ───────────────────────────────────────────────────────────────────────
+function startGPS(){
+  if(!navigator.geolocation){updateGPSUI(false,'Sem GPS');return}
+  const dot=document.getElementById('gps-dot');
+  dot.classList.add('pulse');
+  gpsWatch=navigator.geolocation.watchPosition(
+    pos=>{
+      dot.classList.remove('pulse');
+      dot.classList.add('ok');
+      const spd=pos.coords.speed!=null?(pos.coords.speed*3.6):null;
+      if(spd!=null){
+        speedBuffer.push(spd);
+        if(speedBuffer.length>4)speedBuffer.shift();
+        realSpeed=speedBuffer.reduce((a,b)=>a+b,0)/speedBuffer.length;
+      }
+      if(lastPos&&active){
+        const d=haversine(lastPos.coords.latitude,lastPos.coords.longitude,pos.coords.latitude,pos.coords.longitude);
+        totalDist+=d;
+        document.getElementById('gps-dist').textContent=totalDist.toFixed(2);
+      }
+      lastPos=pos;
+      updateGPSValues(realSpeed);
+    },
+    err=>{dot.classList.remove('ok');updateGPSUI(false,'GPS: '+err.message)},
+    {enableHighAccuracy:true,maximumAge:1000,timeout:10000}
+  );
+}
+
+function stopGPS(){if(gpsWatch!=null){navigator.geolocation.clearWatch(gpsWatch);gpsWatch=null}}
+
+function haversine(lat1,lon1,lat2,lon2){
+  const R=6371,dLat=(lat2-lat1)*Math.PI/180,dLon=(lon2-lon1)*Math.PI/180;
+  const a=Math.sin(dLat/2)**2+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+  return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function updateGPSUI(ok,msg){
+  if(!ok){document.getElementById('gps-speed').textContent='—';document.getElementById('gps-pace').textContent=msg||'—'}
+}
+
+function updateGPSValues(spd){
+  document.getElementById('gps-speed').textContent=spd.toFixed(1);
+  const paceSecPerKm=spd>0.5?3600/spd:null;
+  document.getElementById('gps-pace').textContent=paceSecPerKm?fmt(Math.round(paceSecPerKm)):'—';
+  document.getElementById('real-speed').textContent=spd.toFixed(1);
+
+  // Pace indicator vs target
+  const tgt=PLAN[cWeek]?.[stepIdx]?.speed||0;
+  updatePaceIndicator(spd,tgt);
+}
+
+function updatePaceIndicator(real,tgt){
+  if(!active||tgt===0){setPaceStatus('ok','→','NO ALVO');return}
+  const diff=real-tgt;
+  if(Math.abs(diff)<=SPEED_TOL) setPaceStatus('ok','→','NO ALVO');
+  else if(diff>SPEED_TOL)       setPaceStatus('fast','↑','RÁPIDO');
+  else                           setPaceStatus('slow','↓','LENTO');
+  document.getElementById('real-speed').className='speed-real-val '+(Math.abs(diff)<=SPEED_TOL?'ok':diff>0?'fast':'slow');
+}
+
+function setPaceStatus(cls,arrow,txt){
+  const a=document.getElementById('pace-arrow'),s=document.getElementById('pace-status');
+  a.className='pace-arrow '+cls;a.textContent=arrow;
+  s.className='pace-status '+cls;s.textContent=txt;
+}
+
+// ── HOME ──────────────────────────────────────────────────────────────────────
+function changeWeek(d){cWeek=Math.max(1,Math.min(38,cWeek+d));selIdx=null;renderHome()}
+
+function renderHome(){
+  document.getElementById('wdisp').textContent=cWeek;
+  const sorted=getSorted();
+  document.getElementById('cards').innerHTML=sorted.map((s,i)=>`
+    <div class="card ${selIdx===i?'sel':''}" onclick="selSession(${i})">
+      <div class="cdot dot-${s.type}"></div>
+      <div class="cinfo">
+        <div class="cday">${DAY_FULL[s.day]||s.day}</div>
+        <div class="cname">${s.name}</div>
+        <div class="cmeta">${s.steps.length} blocos · ${fmt(s.steps.reduce((a,b)=>a+b.duration,0))}</div>
+      </div>
+      <div class="carr">›</div>
+    </div>`).join('');
+  document.getElementById('start-btn').disabled=selIdx===null;
+}
+
+function selSession(i){selIdx=i;renderHome();document.getElementById('start-btn').disabled=false}
+
+// ── WORKOUT ───────────────────────────────────────────────────────────────────
+function startWorkout(){
+  const session=getSorted()[selIdx];
+  if(!session)return;
+  active=true;stepIdx=0;stepRemain=0;totalElapsed=0;totalDist=0;lastPos=null;
+  realSpeed=0;speedBuffer.length=0;
+  totalDur=session.steps.reduce((a,b)=>a+b.duration,0);
+
+  document.getElementById('w-wlbl').textContent=`SEMANA ${cWeek} · ${DAY_FULL[session.day]||session.day}`;
+  document.getElementById('w-name').textContent=session.name;
+
+  // Dots
+  document.getElementById('sdots').innerHTML=session.steps.map((_,i)=>`<div class="sdot ${i===0?'cur':''}" id="sd${i}"></div>`).join('');
+
+  show('workout');
+  startGPS();
+  loadStep(session,0);
+  startTimer(session);
+
+  if('wakeLock' in navigator)navigator.wakeLock.request('screen').catch(()=>{});
+  // Announce workout start
+  const s0 = getSorted()[selIdx];
+  if(s0) setTimeout(()=>{
+    speak(`Treino iniciado. ${s0.name}. ${s0.steps.length} blocos.`);
+    setTimeout(()=>speak(stepSpeech(s0.steps[0])), 2500);
+  }, 500);
+}
+
+function loadStep(session,idx){
+  const step=session.steps[idx];
+  if(!step){finishWorkout(session);return}
+  stepIdx=idx;stepRemain=step.duration;
+
+  const type=session.type;
+  const badge=document.getElementById('blk-badge');
+  badge.textContent=step.intensity==='WARMUP'?'AQUECIMENTO':step.intensity==='COOLDOWN'?'ESFRIAMENTO':step.intensity==='RECOVERY'?'RECUPERAÇÃO':type;
+  badge.className='blk-badge type-'+type;
+
+  document.getElementById('tgt-speed').textContent=step.speed.toFixed(1);
+  document.getElementById('blk-desc').textContent=step.name;
+
+  const color=typeColor(type);
+  const ring=document.getElementById('tring');
+  ring.style.stroke=step.intensity==='RECOVERY'?'#3A6B1F':step.intensity==='WARMUP'||step.intensity==='COOLDOWN'?'#1a4a5a':color;
+  ring.style.strokeDashoffset='0';
+
+  const next=session.steps[idx+1];
+  if(next){
+    document.getElementById('next-name').textContent=next.name;
+    document.getElementById('next-spd').textContent=`${next.speed.toFixed(1)} km/h · ${fmt(next.duration)}`;
+    document.getElementById('next-row').style.opacity='1';
+  } else {
+    document.getElementById('next-name').textContent='Fim do treino';
+    document.getElementById('next-spd').textContent='';
+    document.getElementById('next-row').style.opacity='.4';
+  }
+
+  session.steps.forEach((_,i)=>{
+    const d=document.getElementById(`sd${i}`);
+    if(d)d.className='sdot'+(i<idx?' done':i===idx?' cur':'');
+  });
+
+  updateTimer(step.duration,step.duration);
+  updatePaceIndicator(realSpeed,step.speed);
+}
+
+function updateTimer(remain,total){
+  document.getElementById('tsec').textContent=fmt(Math.max(0,remain));
+  const pct=total>0?remain/total:0;
+  document.getElementById('tring').style.strokeDashoffset=String(314.2*(1-pct));
+}
+
+function startTimer(session){
+  clearInterval(timerIv);
+  timerIv=setInterval(()=>{
+    if(!active)return;
+    totalElapsed++;stepRemain--;
+    document.getElementById('prog-elapsed').textContent=fmt(totalElapsed);
+    const doneDur=session.steps.slice(0,stepIdx).reduce((a,b)=>a+b.duration,0)+(session.steps[stepIdx].duration-stepRemain);
+    document.getElementById('prog-fill').style.width=`${(doneDur/totalDur*100).toFixed(1)}%`;
+    document.getElementById('prog-done').textContent=`${stepIdx+1} / ${session.steps.length} blocos`;
+    updateTimer(Math.max(0,stepRemain),session.steps[stepIdx].duration);
+    if(realSpeed>0){
+      updatePaceIndicator(realSpeed,session.steps[stepIdx].speed);
+      paceCheckSpeech(realSpeed,session.steps[stepIdx].speed);
+    }
+    if(stepRemain===5){
+      alertWarn();
+      warningBeforeSpeech(session.steps[stepIdx+1]||null);
+    }
+    if(stepRemain<=0){
+      const ni=stepIdx+1;
+      if(ni<session.steps.length){
+        alertChange();showTransition(session.steps[ni]);
+        setTimeout(()=>{loadStep(session,ni);setTimeout(()=>speak(stepSpeech(session.steps[ni])),300);},2000);
+      } else finishWorkout(session);
+    }
+  },1000);
+}
+
+function showTransition(step){
+  const o=document.getElementById('toverlay');
+  document.getElementById('t-spd').textContent=step.speed.toFixed(1);
+  document.getElementById('t-desc').textContent=
+    step.intensity==='RECOVERY'?'km/h — RECUPERAÇÃO':
+    step.intensity==='WARMUP'?'km/h — AQUECIMENTO':
+    step.intensity==='COOLDOWN'?'km/h — ESFRIAMENTO':'km/h — VÁ!';
+  o.classList.add('show');setTimeout(()=>o.classList.remove('show'),1800);
+}
+
+function stopWorkout(){
+  if(!confirm('Parar o treino?'))return;
+  clearInterval(timerIv);active=false;stopGPS();goHome();
+}
+
+function finishWorkout(session){
+  clearInterval(timerIv);active=false;stopGPS();
+  beep(523,.1);setTimeout(()=>beep(659,.1),150);setTimeout(()=>beep(784,.3),300);
+  if(navigator.vibrate)navigator.vibrate([200,100,200,100,400]);
+  document.getElementById('d-dur').textContent=fmt(totalElapsed);
+  document.getElementById('d-dist').textContent=totalDist.toFixed(2);
+  const avgPace=totalDist>0?totalElapsed/totalDist:0;
+  document.getElementById('d-pace').textContent=avgPace>0?fmt(Math.round(avgPace)):'—';
+  document.getElementById('d-week').textContent=`S${cWeek}`;
+  speak('Treino concluído! Parabéns!', true);
+  show('done');
+}
+
+function goHome(){clearInterval(timerIv);active=false;stopGPS();show('home')}
+
+
+// ── SPEECH (Web Speech API → Bluetooth fone) ─────────────────────────────────
+const SPEECH_LANG = 'pt-BR';
+let speechEnabled = true;
+let speechQueue = [];
+let speaking = false;
+
+function speak(text, priority=false) {
+  if (!speechEnabled || !window.speechSynthesis) return;
+  if (priority) speechQueue = [text];  // cancela fila, fala imediatamente
+  else speechQueue.push(text);
+  if (!speaking) processQueue();
+}
+
+function processQueue() {
+  if (!speechQueue.length) { speaking = false; return; }
+  speaking = true;
+  const text = speechQueue.shift();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = SPEECH_LANG;
+  utt.rate = 1.05;
+  utt.pitch = 1.0;
+  utt.volume = 1.0;
+  utt.onend = () => setTimeout(processQueue, 200);
+  utt.onerror = () => { speaking = false; processQueue(); };
+  window.speechSynthesis.cancel();
+  window.speechSynthesis.speak(utt);
+}
+
+// Descrição falada de cada step
+function stepSpeech(step) {
+  const spd = step.speed.toFixed(1).replace('.', ',');
+  const dur = step.duration;
+  const mins = Math.floor(dur / 60);
+  const secs = dur % 60;
+  const durStr = mins > 0
+    ? (secs > 0 ? `${mins} minuto${mins>1?'s':''} e ${secs} segundos` : `${mins} minuto${mins>1?'s':''}`)
+    : `${secs} segundos`;
+
+  const intMap = {
+    WARMUP:   `Aquecimento. ${spd} quilômetros por hora. ${durStr}.`,
+    COOLDOWN: `Esfriamento. ${spd} quilômetros por hora. ${durStr}.`,
+    RECOVERY: `Recuperação. Baixe para ${spd} quilômetros por hora. ${durStr}.`,
+    ACTIVE:   `Agora. ${spd} quilômetros por hora. ${durStr}.`,
+  };
+  return intMap[step.intensity] || `${spd} quilômetros por hora. ${durStr}.`;
+}
+
+// Aviso 5 segundos antes
+function warningBeforeSpeech(nextStep) {
+  if (!nextStep) {
+    speak('Atenção. Treino terminando em cinco segundos.', true);
+    return;
+  }
+  const spd = nextStep.speed.toFixed(1).replace('.', ',');
+  const intMap = {
+    WARMUP:   `Em cinco segundos, aquecimento. ${spd} quilômetros por hora.`,
+    COOLDOWN: `Em cinco segundos, esfriamento. ${spd} quilômetros por hora.`,
+    RECOVERY: `Em cinco segundos, recuperação. ${spd} quilômetros por hora.`,
+    ACTIVE:   `Em cinco segundos, ${spd} quilômetros por hora.`,
+  };
+  speak(intMap[nextStep.intensity] || `Em cinco segundos, ${spd} quilômetros por hora.`, true);
+}
+
+// Avisos periódicos de pace durante o bloco
+let lastPaceAlert = 0;
+function paceCheckSpeech(realSpd, tgtSpd) {
+  if (!active || tgtSpd === 0 || !speechEnabled) return;
+  const now = Date.now();
+  if (now - lastPaceAlert < 20000) return; // no máximo 1 aviso a cada 20seg
+  const diff = realSpd - tgtSpd;
+  if (realSpd < 0.5) return; // parado, não fala
+  if (Math.abs(diff) > 1.2) {
+    lastPaceAlert = now;
+    if (diff > 0) speak(`Você está rápido demais. Reduza para ${tgtSpd.toFixed(1).replace('.',',')} quilômetros por hora.`);
+    else          speak(`Você está lento demais. Acelere para ${tgtSpd.toFixed(1).replace('.',',')} quilômetros por hora.`);
+  }
+}
+
+// Speech toggle button (add to workout header area)
+function addSpeechToggle() {
+  const btn = document.createElement('button');
+  btn.id = 'speech-toggle';
+  btn.style.cssText = `
+    position:fixed;bottom:32px;right:20px;z-index:50;
+    background:#0f2318;border:1px solid #1a3a22;border-radius:50%;
+    width:48px;height:48px;font-size:20px;cursor:pointer;
+    display:none;align-items:center;justify-content:center;
+    box-shadow:0 2px 12px rgba(0,0,0,.4);
+  `;
+  btn.textContent = '🔊';
+  btn.title = 'Ativar/desativar voz';
+  btn.onclick = () => {
+    speechEnabled = !speechEnabled;
+    btn.textContent = speechEnabled ? '🔊' : '🔇';
+    btn.style.borderColor = speechEnabled ? '#76B746' : '#e05040';
+    if (speechEnabled) speak('Voz ativada.');
+    else window.speechSynthesis.cancel();
+  };
+  document.body.appendChild(btn);
+  document.getElementById('workout').addEventListener('transitionend', () => {});
+  // Show when workout screen is active
+  const observer = new MutationObserver(() => {
+    btn.style.display = document.getElementById('workout').classList.contains('active') ? 'flex' : 'none';
+  });
+  observer.observe(document.getElementById('workout'), {attributes:true, attributeFilter:['class']});
+}
+
+
+// Offline: app is self-contained, no SW needed for file:// protocol
+
+// ── PWA INSTALL BANNER ────────────────────────────────────────────────────────
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallBanner();
+});
+
+function showInstallBanner() {
+  if (document.getElementById('install-banner')) return;
+  const banner = document.createElement('div');
+  banner.id = 'install-banner';
+  banner.style.cssText = `
+    position:fixed;bottom:0;left:0;right:0;z-index:200;
+    background:#0f2318;border-top:1px solid #76B746;
+    padding:14px 20px;display:flex;align-items:center;gap:12px;
+    font-family:'DM Sans',sans-serif;
+  `;
+  banner.innerHTML = `
+    <div style="flex:1">
+      <div style="font-weight:600;font-size:14px;color:#f0f5f1">Instalar COACH</div>
+      <div style="font-size:12px;color:#4a6a52;margin-top:2px">Adicionar à tela inicial como app</div>
+    </div>
+    <button onclick="installPWA()" style="background:#76B746;color:#0a1a10;border:none;border-radius:8px;padding:10px 18px;font-weight:600;font-size:13px;cursor:pointer">INSTALAR</button>
+    <button onclick="document.getElementById('install-banner').remove()" style="background:none;border:none;color:#4a6a52;font-size:20px;cursor:pointer;padding:4px">×</button>
+  `;
+  document.body.appendChild(banner);
+}
+
+async function installPWA() {
+  if (!deferredPrompt) return;
+  deferredPrompt.prompt();
+  const {outcome} = await deferredPrompt.userChoice;
+  deferredPrompt = null;
+  const banner = document.getElementById('install-banner');
+  if (banner) banner.remove();
+  if (outcome === 'accepted') speak('App instalado com sucesso!');
+}
+
+// Show install tip whenever not in standalone mode
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const isStandalone = window.navigator.standalone ||
+      window.matchMedia('(display-mode: standalone)').matches;
+    if (isStandalone) return;
+    if (!deferredPrompt) showManualInstallTip();
+  }, 2000);
+});
+
+function showManualInstallTip() {
+  if (document.getElementById('install-banner')) return;
+  if (document.getElementById('manual-tip')) return;
+  const tip = document.createElement('div');
+  tip.id = 'manual-tip';
+  tip.style.cssText = `
+    position:fixed;bottom:0;left:0;right:0;z-index:200;
+    background:#0f2318;border-top:1px solid #3A6B1F;
+    padding:14px 20px;display:flex;align-items:center;gap:12px;
+    font-family:'DM Sans',sans-serif;
+  `;
+  tip.innerHTML = `
+    <div style="flex:1">
+      <div style="font-weight:600;font-size:13px;color:#f0f5f1">Instalar como app</div>
+      <div style="font-size:11px;color:#4a6a52;margin-top:3px;line-height:1.4">
+        Chrome: Menu (⋮) → <b style="color:#76B746">Adicionar à tela inicial</b>
+      </div>
+    </div>
+    <button onclick="document.getElementById('manual-tip').remove()" style="background:none;border:none;color:#4a6a52;font-size:20px;cursor:pointer;padding:4px">×</button>
+  `;
+  document.body.appendChild(tip);
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+(function(){
+  const start=new Date('2026-04-07'),now=new Date();
+  cWeek=Math.max(1,Math.min(38,Math.floor((now-start)/(7*864e5))+1));
+  renderHome();
+  addSpeechToggle();
+  // Pre-warm speech engine
+  if(window.speechSynthesis){
+    const w=new SpeechSynthesisUtterance('');
+    w.volume=0;window.speechSynthesis.speak(w);
+  }
+})();
+</script>
+</body>
+</html>
